@@ -1,8 +1,9 @@
-from flask import Flask, render_template_string, request, jsonify
+from flask import Flask, render_template_string, request, jsonify, send_from_directory
 import requests
 import math
+import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='.')
 
 # HTML şablonu
 INDEX_TEMPLATE = '''
@@ -57,7 +58,7 @@ INDEX_TEMPLATE = '''
     <div class="relative py-3 sm:max-w-5xl sm:mx-auto">
         <div class="glass-morphism relative px-4 py-10 shadow-lg sm:rounded-3xl sm:p-20">
             <div class="max-w-5xl mx-auto">
-                <div id="logo" class="w-32 h-32 mx-auto mb-4 bg-contain bg-no-repeat bg-center" style="background-image: url('logo.png');"></div>
+                <div id="logo" class="w-32 h-32 mx-auto mb-4 bg-contain bg-no-repeat bg-center" style="background-image: url('/logo.png');"></div>
                 <h1 id="mainTitle" class="text-3xl font-semibold mb-6 text-center text-white">Çok Dilli Uçuş Takip</h1>
                 
                 <div class="mb-4 text-center">
@@ -322,11 +323,24 @@ INDEX_TEMPLATE = '''
     updateLanguage('en');  // Set default language to English
     </script>
 </body>
-</html>'''
+</html>
+'''
+from flask import Flask, render_template_string, request, jsonify, send_from_directory
+import requests
+import math
+import os
+
+app = Flask(__name__, static_folder='.')
+
+# HTML şablonu ve diğer kodlar buraya gelecek...
 
 @app.route('/')
 def index():
     return render_template_string(INDEX_TEMPLATE)
+
+@app.route('/logo.png')
+def serve_logo():
+    return send_from_directory('.', 'logo.png')
 
 @app.route('/get_flights', methods=['POST'])
 def get_flights():
