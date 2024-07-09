@@ -38,7 +38,7 @@ Follow these steps to run the project on your local machine:
     ```
     python app.py
     ```
-5. Open your browser and go to `http://127.0.0.1:5000/` to start using the application.
+5. Open your browser and go to `http://127.0.0.1:5000` to start using the application.
 
 ## Usage
 
