@@ -96,8 +96,8 @@ const translations = {
 let currentLat, currentLon;
 const radiusSlider = document.getElementById("radiusSlider");
 const radiusValue = document.getElementById("radiusValue");
-const canvas = document.getElementById('radarCanvas');
-const ctx = canvas.getContext('2d');
+const canvas = document.getElementById("radarCanvas");
+const ctx = canvas.getContext("2d");
 let currentFlights = []; // Mevcut uçuşları saklayacak global değişken
 
 function updateLanguage(lang) {
@@ -107,7 +107,7 @@ function updateLanguage(lang) {
     document.getElementById("radiusLabel").textContent = translations[lang].radiusLabel;
     document.getElementById("refreshBtn").textContent = translations[lang].refreshLabel;
     document.getElementById("downloadBtn").textContent = translations[lang].downloadLabel;
-    
+
     // Tablo başlıklarını güncelle
     document.getElementById("thCallsign").textContent = translations[lang].thCallsign;
     document.getElementById("thCountry").textContent = translations[lang].thCountry;
@@ -116,7 +116,7 @@ function updateLanguage(lang) {
     document.getElementById("thDirection").textContent = translations[lang].thDirection;
     document.getElementById("thLatitude").textContent = translations[lang].thLatitude;
     document.getElementById("thLongitude").textContent = translations[lang].thLongitude;
-    
+
     updateFlightCount(lang);
 }
 
@@ -141,7 +141,7 @@ function showPosition(position) {
 }
 
 function showError(error) {
-    switch(error.code) {
+    switch (error.code) {
         case error.PERMISSION_DENIED:
             alert("User denied the request for Geolocation.");
             break;
@@ -158,7 +158,8 @@ function showError(error) {
 }
 
 function getCity(lat, lon) {
-    axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`)
+    axios
+        .get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`)
         .then((response) => {
             const city = response.data.address.city || response.data.address.town || response.data.address.village || "Unknown City";
             const lang = document.getElementById("languageSelect").value;
@@ -168,36 +169,36 @@ function getCity(lat, lon) {
 }
 
 function initRadar() {
-    const container = document.getElementById('radarContainer');
+    const container = document.getElementById("radarContainer");
     canvas.width = container.offsetWidth;
     canvas.height = container.offsetHeight;
     drawRadar();
-    
+
     // Radar üzerine tıklama olayı dinleyicisi ekle
-    canvas.addEventListener('click', handleRadarClick);
+    canvas.addEventListener("click", handleRadarClick);
 }
 
 function drawRadar() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     const radius = Math.min(centerX, centerY) - 10;
 
     // Radar arka planı
-    ctx.fillStyle = 'rgba(0, 31, 63, 0.1)';
+    ctx.fillStyle = "rgba(0, 31, 63, 0.1)";
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
     ctx.fill();
 
     // Radar çizgileri
-    ctx.strokeStyle = 'rgba(0, 255, 0, 0.5)';
+    ctx.strokeStyle = "rgba(0, 255, 0, 0.5)";
     ctx.lineWidth = 1;
 
     // Daireler
     for (let i = 1; i <= 4; i++) {
         ctx.beginPath();
-        ctx.arc(centerX, centerY, radius * i / 4, 0, 2 * Math.PI);
+        ctx.arc(centerX, centerY, (radius * i) / 4, 0, 2 * Math.PI);
         ctx.stroke();
     }
 
@@ -213,13 +214,13 @@ function drawRadar() {
 
 function updateRadarPoints(flights) {
     drawRadar();
-    
+
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     const radius = Math.min(centerX, centerY) - 10;
 
-    ctx.fillStyle = 'yellow';
-    flights.forEach(flight => {
+    ctx.fillStyle = "yellow";
+    flights.forEach((flight) => {
         const lat = parseFloat(flight.latitude);
         const lon = parseFloat(flight.longitude);
         if (!isNaN(lat) && !isNaN(lon)) {
@@ -229,17 +230,17 @@ function updateRadarPoints(flights) {
             const normalizedDistance = Math.min(distance / maxDistance, 1);
             const x = centerX + Math.sin(bearing) * normalizedDistance * radius;
             const y = centerY - Math.cos(bearing) * normalizedDistance * radius;
-            
+
             ctx.beginPath();
             ctx.arc(x, y, 3, 0, 2 * Math.PI);
             ctx.fill();
-            
+
             // Her uçuş için x ve y koordinatlarını sakla
             flight.radarX = x;
             flight.radarY = y;
         }
     });
-    
+
     // Güncel uçuş listesini sakla
     currentFlights = flights;
 }
@@ -248,12 +249,12 @@ function handleRadarClick(event) {
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
-    
+
     // En yakın uçuşu bul
     let closestFlight = null;
     let minDistance = Infinity;
-    
-    currentFlights.forEach(flight => {
+
+    currentFlights.forEach((flight) => {
         if (flight.radarX && flight.radarY) {
             const distance = Math.sqrt(Math.pow(x - flight.radarX, 2) + Math.pow(y - flight.radarY, 2));
             if (distance < minDistance) {
@@ -262,7 +263,7 @@ function handleRadarClick(event) {
             }
         }
     });
-    
+
     // Eğer yakın bir uçuş bulunduysa ve yeterince yakınsa (örneğin 10 piksel içinde)
     if (closestFlight && minDistance < 10) {
         showFlightInfo(closestFlight);
@@ -271,8 +272,8 @@ function handleRadarClick(event) {
 
 function showFlightInfo(flight) {
     // Uçuş bilgilerini göstermek için bir popup oluştur
-    const popup = document.createElement('div');
-    popup.className = 'fixed z-10 inset-0 overflow-y-auto';
+    const popup = document.createElement("div");
+    popup.className = "fixed z-10 inset-0 overflow-y-auto";
     popup.innerHTML = `
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 transition-opacity" aria-hidden="true">
@@ -304,18 +305,19 @@ function showFlightInfo(flight) {
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(popup);
-    
+
     // Popup'ı kapatmak için event listener ekle
-    document.getElementById('closePopup').addEventListener('click', () => {
+    document.getElementById("closePopup").addEventListener("click", () => {
         document.body.removeChild(popup);
     });
 }
 
 function getFlights(lat, lon) {
     const radius = radiusSlider.value;
-    axios.post("/get_flights", { lat, lon, radius })
+    axios
+        .post("/get_flights", { lat, lon, radius })
         .then((response) => {
             const flights = response.data;
             updateFlightTable(flights);
@@ -349,42 +351,38 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     const R = 6371; // Dünya'nın yarıçapı (km)
     const dLat = deg2rad(lat2 - lat1);
     const dLon = deg2rad(lon2 - lon1);
-    const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
 }
 
 function calculateBearing(lat1, lon1, lat2, lon2) {
     const dLon = deg2rad(lon2 - lon1);
     const y = Math.sin(dLon) * Math.cos(deg2rad(lat2));
-    const x = Math.cos(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) -
-              Math.sin(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(dLon);
+    const x = Math.cos(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) - Math.sin(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(dLon);
     return Math.atan2(y, x);
 }
 
 function deg2rad(deg) {
-    return deg * (Math.PI/180);
+    return deg * (Math.PI / 180);
 }
 
 // Event Listeners
-window.addEventListener('load', () => {
+window.addEventListener("load", () => {
     initRadar();
     getLocation();
     updateLanguage("en"); // Varsayılan dili İngilizce olarak ayarla
 });
 
-window.addEventListener('resize', initRadar);
+window.addEventListener("resize", initRadar);
 
 document.getElementById("refreshBtn").addEventListener("click", () => getFlights(currentLat, currentLon));
 
-document.getElementById("languageSelect").addEventListener("change", function() {
+document.getElementById("languageSelect").addEventListener("change", function () {
     updateLanguage(this.value);
 });
 
-radiusSlider.addEventListener("input", function() {
+radiusSlider.addEventListener("input", function () {
     document.getElementById("radiusValue").textContent = this.value;
     getFlights(currentLat, currentLon);
 });

@@ -6,40 +6,44 @@ Flight-Radar is a multilingual web application that tracks and displays real-tim
 
 ## Features
 
-- Real-time flight tracking using OpenSky Network API
-- Multilingual support (English, Russian, German, Turkish, Spanish, French)
-- Automatic location detection for nearby flight information
-- Adjustable search radius
-- Interactive radar display with clickable flight points
-- Detailed flight information popup on radar click
-- Interactive table displaying flight details
-- Download flight data as JPG
-- Audio notification for new detected flights
-- Dark/Light mode toggle
-- Responsive design for various devices
+-   Real-time flight tracking using OpenSky Network API
+-   Multilingual support (English, Russian, German, Turkish, Spanish, French)
+-   Automatic location detection for nearby flight information
+-   Adjustable search radius
+-   Interactive radar display with clickable flight points
+-   Detailed flight information popup on radar click
+-   Interactive table displaying flight details
+-   Download flight data as JPG
+-   Audio notification for new detected flights
+-   Dark/Light mode toggle
+-   Responsive design for various devices
 
 ## Installation
 
 Follow these steps to run the project on your local machine:
 
 1. Clone the repository:
+
     ```
     git clone https://github.com/U-C4N/Flight-Radar.git
     cd Flight-Radar
     ```
 
 2. Create and activate a virtual Python environment:
+
     ```
     python -m venv venv
     source venv/bin/activate  # For Windows: venv\Scripts\activate
     ```
 
 3. Install the required packages:
+
     ```
     pip install -r requirements.txt
     ```
 
 4. Run the application:
+
     ```
     python app.py
     ```
@@ -58,16 +62,16 @@ Follow these steps to run the project on your local machine:
 
 ## New Features
 
-- **Interactive Radar**: The radar now displays clickable points representing flights.
-- **Flight Information Popup**: Clicking on a flight point in the radar opens a popup with detailed flight information.
-- **Dynamic Language Updates**: The interface, including table headers and flight count, now updates dynamically when changing the language.
+-   **Interactive Radar**: The radar now displays clickable points representing flights.
+-   **Flight Information Popup**: Clicking on a flight point in the radar opens a popup with detailed flight information.
+-   **Dynamic Language Updates**: The interface, including table headers and flight count, now updates dynamically when changing the language.
 
 ## Acknowledgments
 
-- [Flask](https://flask.palletsprojects.com/) - Web framework
-- [OpenSky Network API](https://opensky-network.org/apidoc/) - Flight data provider
-- [TailwindCSS](https://tailwindcss.com/) - CSS framework for styling
-- [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript) - For interactive features
+-   [Flask](https://flask.palletsprojects.com/) - Web framework
+-   [OpenSky Network API](https://opensky-network.org/apidoc/) - Flight data provider
+-   [TailwindCSS](https://tailwindcss.com/) - CSS framework for styling
+-   [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript) - For interactive features
 
 ## License
 
