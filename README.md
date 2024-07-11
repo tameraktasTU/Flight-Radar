@@ -2,7 +2,7 @@
 
 Flight-Radar is a multilingual web application that tracks and displays real-time flight data using the OpenSky Network API. Built with Python Flask, this application offers an interactive interface for viewing nearby flights with various customization options.
 
-![Flight-Radar Screenshot](/static/img/readme.jpg)
+![Flight-Radar Screenshot](/static/img/readme.png)
 
 ## Features
 
