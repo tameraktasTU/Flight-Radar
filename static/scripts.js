@@ -367,6 +367,17 @@ function deg2rad(deg) {
     return deg * (Math.PI / 180);
 }
 
+function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+}
+
+const debouncedGetFlights = debounce(() => getFlights(currentLat, currentLon), 1000);
+
 // Event Listeners
 window.addEventListener("load", () => {
     initRadar();
@@ -384,7 +395,7 @@ document.getElementById("languageSelect").addEventListener("change", function ()
 
 radiusSlider.addEventListener("input", function () {
     document.getElementById("radiusValue").textContent = this.value;
-    getFlights(currentLat, currentLon);
+    debouncedGetFlights();
 });
 
 document.getElementById("downloadBtn").addEventListener("click", function () {
