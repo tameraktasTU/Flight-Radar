@@ -18,7 +18,6 @@ def get_flights():
     url = f"https://opensky-network.org/api/states/all?lamin={lat-1}&lomin={lon-1}&lamax={lat+1}&lomax={lon+1}"
     response = requests.get(url)
     data = response.json()
-    
     flight_data = []
     if data["states"]:
         for state in data["states"]:
@@ -33,7 +32,9 @@ def get_flights():
                     "velocity": f"{round(float(state[9]) * 3.6, 2)} km/h" if state[9] else "N/A",
                     "true_track": f"{state[10]}°" if state[10] else "N/A",
                     "latitude": state[6],
-                    "longitude": state[5]
+                    "longitude": state[5],
+                    "on_ground": state[8],
+                    "vertical_speed": f"{round(float(state[11]) * 196.850394, 2)} fpm" if state[11] else "N/A"
                 })
     return jsonify(flight_data)
 

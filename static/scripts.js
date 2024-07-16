@@ -91,7 +91,6 @@ const translations = {
         flightCountLabel: "Total des vols trouvés:",
     },
 };
-// const translations = { ... } // Bu kısmı önceki versiyondan kopyalayın
 
 let currentLat, currentLon;
 const radiusSlider = document.getElementById("radiusSlider");
@@ -108,7 +107,6 @@ function updateLanguage(lang) {
     document.getElementById("refreshBtn").textContent = translations[lang].refreshLabel;
     document.getElementById("downloadBtn").textContent = translations[lang].downloadLabel;
 
-    // Tablo başlıklarını güncelle
     document.getElementById("thCallsign").textContent = translations[lang].thCallsign;
     document.getElementById("thCountry").textContent = translations[lang].thCountry;
     document.getElementById("thAltitude").textContent = translations[lang].thAltitude;
@@ -173,36 +171,26 @@ function initRadar() {
     canvas.width = container.offsetWidth;
     canvas.height = container.offsetHeight;
     drawRadar();
-
-    // Radar üzerine tıklama olayı dinleyicisi ekle
     canvas.addEventListener("click", handleRadarClick);
 }
 
 function drawRadar() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     const radius = Math.min(centerX, centerY) - 10;
-
-    // Radar arka planı
     ctx.fillStyle = "rgba(0, 31, 63, 0.1)";
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
     ctx.fill();
-
-    // Radar çizgileri
     ctx.strokeStyle = "rgba(0, 255, 0, 0.5)";
     ctx.lineWidth = 1;
 
-    // Daireler
     for (let i = 1; i <= 4; i++) {
         ctx.beginPath();
         ctx.arc(centerX, centerY, (radius * i) / 4, 0, 2 * Math.PI);
         ctx.stroke();
     }
-
-    // Çizgiler
     for (let i = 0; i < 8; i++) {
         const angle = (i / 8) * Math.PI * 2;
         ctx.beginPath();
@@ -212,36 +200,58 @@ function drawRadar() {
     }
 }
 
+function drawAirplane(ctx, x, y, size, bearing, on_ground, fpm) {
+    const radians = bearing;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(radians);
+    ctx.beginPath();
+    ctx.moveTo(0, -size / 2); // Nose
+    ctx.lineTo(size / 2, size / 2); // Right wing
+    ctx.lineTo(0, size / 4); // Tail
+    ctx.lineTo(-size / 2, size / 2); // Left wing
+    ctx.closePath();
+    if (!on_ground) {
+        ctx.fillStyle = "yellow";
+    } else {
+        ctx.fillStyle = "red";
+    }
+    ctx.fill();
+    console.log(fpm);
+    if (!isNaN(fpm)) {
+        const signX = size / 2 + 5; // Position the sign slightly to the right of the right wing
+        const signY = 3; // Position the sign vertically centered with the airplane
+        ctx.font = "12px Arial";
+        ctx.fillStyle = "yellow";
+        ctx.fillText(fpm > 0 ? "+" : "-", signX, signY);
+    }
+    ctx.restore();
+}
+
 function updateRadarPoints(flights) {
     drawRadar();
-
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     const radius = Math.min(centerX, centerY) - 10;
-
     ctx.fillStyle = "yellow";
     flights.forEach((flight) => {
         const lat = parseFloat(flight.latitude);
         const lon = parseFloat(flight.longitude);
         if (!isNaN(lat) && !isNaN(lon)) {
             const distance = calculateDistance(currentLat, currentLon, lat, lon);
-            const bearing = calculateBearing(currentLat, currentLon, lat, lon);
+            const radians = (parseFloat(flight.true_track.toString().replace("°", "")) * Math.PI) / 180;
             const maxDistance = parseFloat(radiusSlider.value);
             const normalizedDistance = Math.min(distance / maxDistance, 1);
-            const x = centerX + Math.sin(bearing) * normalizedDistance * radius;
-            const y = centerY - Math.cos(bearing) * normalizedDistance * radius;
-
-            ctx.beginPath();
-            ctx.arc(x, y, 3, 0, 2 * Math.PI);
-            ctx.fill();
-
-            // Her uçuş için x ve y koordinatlarını sakla
+            const x = centerX + Math.sin(radians) * normalizedDistance * radius;
+            const y = centerY - Math.cos(radians) * normalizedDistance * radius;
+            const on_ground = flight.on_ground;
+            const fpm = parseFloat(flight.vertical_speed.toString().replace(" fpm", ""));
+            const airplaneSize = 10; // Size of the airplane shape
+            drawAirplane(ctx, x, y, airplaneSize, radians, on_ground, fpm);
             flight.radarX = x;
             flight.radarY = y;
         }
     });
-
-    // Güncel uçuş listesini sakla
     currentFlights = flights;
 }
 
@@ -249,11 +259,8 @@ function handleRadarClick(event) {
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
-
-    // En yakın uçuşu bul
     let closestFlight = null;
     let minDistance = Infinity;
-
     currentFlights.forEach((flight) => {
         if (flight.radarX && flight.radarY) {
             const distance = Math.sqrt(Math.pow(x - flight.radarX, 2) + Math.pow(y - flight.radarY, 2));
@@ -263,15 +270,12 @@ function handleRadarClick(event) {
             }
         }
     });
-
-    // Eğer yakın bir uçuş bulunduysa ve yeterince yakınsa (örneğin 10 piksel içinde)
     if (closestFlight && minDistance < 10) {
         showFlightInfo(closestFlight);
     }
 }
 
 function showFlightInfo(flight) {
-    // Uçuş bilgilerini göstermek için bir popup oluştur
     const popup = document.createElement("div");
     popup.className = "fixed z-10 inset-0 overflow-y-auto";
     popup.innerHTML = `
@@ -293,7 +297,9 @@ function showFlightInfo(flight) {
                             Speed: ${flight.velocity}<br>
                             Direction: ${flight.true_track}<br>
                             Latitude: ${flight.latitude}<br>
-                            Longitude: ${flight.longitude}
+                            Longitude: ${flight.longitude}<br>
+                            On Ground: ${flight.on_ground}<br>
+                            Vertical Speed: ${flight.vertical_speed}
                         </p>
                     </div>
                 </div>
@@ -305,10 +311,7 @@ function showFlightInfo(flight) {
             </div>
         </div>
     `;
-
     document.body.appendChild(popup);
-
-    // Popup'ı kapatmak için event listener ekle
     document.getElementById("closePopup").addEventListener("click", () => {
         document.body.removeChild(popup);
     });
@@ -354,13 +357,6 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
-}
-
-function calculateBearing(lat1, lon1, lat2, lon2) {
-    const dLon = deg2rad(lon2 - lon1);
-    const y = Math.sin(dLon) * Math.cos(deg2rad(lat2));
-    const x = Math.cos(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) - Math.sin(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(dLon);
-    return Math.atan2(y, x);
 }
 
 function deg2rad(deg) {
