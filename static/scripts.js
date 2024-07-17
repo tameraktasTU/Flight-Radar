@@ -217,9 +217,8 @@ function drawAirplane(ctx, x, y, size, bearing, on_ground, fpm) {
         ctx.fillStyle = "red";
     }
     ctx.fill();
-    console.log(fpm);
     if (!isNaN(fpm)) {
-        const signX = size / 2 + 5; // Position the sign slightly to the right of the right wing
+        const signX = size / 2 + 1.5; // Position the sign slightly to the right of the right wing
         const signY = 3; // Position the sign vertically centered with the airplane
         ctx.font = "12px Arial";
         ctx.fillStyle = "yellow";
